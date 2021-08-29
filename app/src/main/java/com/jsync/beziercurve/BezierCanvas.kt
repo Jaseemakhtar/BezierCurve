@@ -20,10 +20,10 @@ class BezierCanvas @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attributeSet, defStyleAttr) {
 
-    private val CONTROLPOINT_RADIUS = 8f.DptoPx()
-    private val LERPPOINT_RADIUS = 6f.DptoPx()
-    private val CURVEPOINT_RADIUS = 2f.DptoPx()
-    private val CONTROLPOINT_DIAMETER = 16f.DptoPx()
+    private val controlpointRadius = 8f.DptoPx()
+    private val subpointsRadius = 6f.DptoPx()
+    private val curvepointRadius = 2f.DptoPx()
+    private val controlpointsDiameter = 16f.DptoPx()
 
     private val controlPointPaint = Paint(Paint.ANTI_ALIAS_FLAG).also {
         it.style = Paint.Style.FILL
@@ -104,11 +104,10 @@ class BezierCanvas @JvmOverloads constructor(
         )
 
     private val controlPoints: List<ControlPoint> = listOf(
-        elements = Array(6) { ControlPoint() }
+        elements = Array(MAX_CONTROL_POINTS) { ControlPoint() }
     )
     private var directSubPoints: MutableList<ControlPoint> = mutableListOf()
     private val curvePoints: MutableList<ControlPoint> = mutableListOf()
-
 
     private var lerpPointsAnimator: ValueAnimator? = null
 
@@ -138,7 +137,7 @@ class BezierCanvas @JvmOverloads constructor(
                 for (i in 0 until controlPointCount) {
                     if (
                         controlPoints[i]
-                            .getDistance(ControlPoint(event.x, event.y)) <= CONTROLPOINT_DIAMETER
+                            .getDistance(ControlPoint(event.x, event.y)) <= controlpointsDiameter
                     ) {
                         selectedPoint = i
                         break
@@ -190,7 +189,7 @@ class BezierCanvas @JvmOverloads constructor(
             canvas?.drawCircle(
                 controlPoints[i].x,
                 controlPoints[i].y,
-                CONTROLPOINT_RADIUS,
+                controlpointRadius,
                 controlPointPaint
             )
 
@@ -212,7 +211,7 @@ class BezierCanvas @JvmOverloads constructor(
             canvas?.drawCircle(
                 curvePoints[i].x,
                 curvePoints[i].y,
-                CURVEPOINT_RADIUS,
+                curvepointRadius,
                 curveBluePaint
             )
         }
@@ -223,7 +222,7 @@ class BezierCanvas @JvmOverloads constructor(
             canvas?.drawCircle(
                 subPoints[i].x,
                 subPoints[i].y,
-                LERPPOINT_RADIUS,
+                subpointsRadius,
                 pointPaints[currentColorIndex]
             )
 
@@ -270,9 +269,9 @@ class BezierCanvas @JvmOverloads constructor(
         for (i in 0 until controlPointCount) {
             if (controlPoints[i].isNotInitialized()) {
                 controlPoints[i].x =
-                    getRandom(CONTROLPOINT_DIAMETER, width - CONTROLPOINT_DIAMETER)
+                    getRandom(controlpointsDiameter, width - controlpointsDiameter)
                 controlPoints[i].y =
-                    getRandom(CONTROLPOINT_DIAMETER, height - CONTROLPOINT_DIAMETER)
+                    getRandom(controlpointsDiameter, height - controlpointsDiameter)
             }
         }
     }
@@ -284,7 +283,7 @@ class BezierCanvas @JvmOverloads constructor(
     }
 
     fun add() {
-        if (controlPointCount < 6) {
+        if (controlPointCount < MAX_CONTROL_POINTS) {
             controlPointCount++
             initControlPoints()
             invalidate()
@@ -359,5 +358,9 @@ class BezierCanvas @JvmOverloads constructor(
 
     interface ActionListener {
         fun onAnimationEnd()
+    }
+
+    companion object {
+        private const val MAX_CONTROL_POINTS = 12
     }
 }

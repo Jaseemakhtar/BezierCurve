@@ -3,7 +3,6 @@ package com.jsync.beziercurve
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
@@ -21,13 +20,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, BezierCanvas.Act
 
     private lateinit var buttonShowLerp: MaterialCheckBox
 
-    private lateinit var editDuration: AppCompatEditText
+    private lateinit var textDuration: MaterialTextView
 
     private lateinit var textCount: MaterialTextView
 
     private lateinit var bezierCanvas: BezierCanvas
-
-    private var MINIMUM_DURATION: Long = 500L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.navigationBarColor = ContextCompat.getColor(this, R.color.greyCard)
@@ -42,7 +39,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, BezierCanvas.Act
 
         buttonShowLerp = findViewById(R.id.checkbox_show_lerp)
 
-        editDuration = findViewById(R.id.edit_duration)
+        textDuration = findViewById(R.id.text_duration)
 
         textCount = findViewById(R.id.text_count)
 
@@ -58,7 +55,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, BezierCanvas.Act
 
         buttonShowLerp.setOnCheckedChangeListener { _, isChecked ->
             if (bezierCanvas.isAnimating()) {
-                buttonShowLerp.isChecked = true
+                buttonShowLerp.isChecked = !isChecked
             } else {
                 bezierCanvas.showLerp = isChecked
             }
@@ -95,13 +92,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, BezierCanvas.Act
 
             R.id.button_increase_duration -> {
                 bezierCanvas.duration = bezierCanvas.duration + MINIMUM_DURATION
-                editDuration.setText("${bezierCanvas.duration}ms")
+                textDuration.text = "${bezierCanvas.duration}ms"
             }
 
             R.id.button_decrease_duration -> {
                 if (bezierCanvas.duration > MINIMUM_DURATION) {
                     bezierCanvas.duration = bezierCanvas.duration - MINIMUM_DURATION
-                    editDuration.setText("${bezierCanvas.duration}ms")
+                    textDuration.text = "${bezierCanvas.duration}ms"
                 }
             }
 
@@ -113,5 +110,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, BezierCanvas.Act
 
     override fun onAnimationEnd() {
         buttonAnim.setImageResource(R.drawable.ic_play_circle)
+    }
+
+    companion object {
+        private const val MINIMUM_DURATION = 500L
     }
 }
